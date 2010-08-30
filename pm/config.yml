@@ -1,0 +1,42 @@
+--- 
+pools:
+  irc:
+  - dream
+  - eldridge
+  - excelsior
+  - optical
+  - paradox
+  - reach
+  - triton
+  irc.eu:
+  - excelsior
+  - optical
+  - triton
+  irc.us:
+  - dream
+  - eldridge
+  - paradox
+  - reach
+  bots:
+  - dream
+  - eldridge
+  - excelsior
+  - optical
+  - paradox
+  - reach
+  - triton
+v6-pools:
+  irc.ipv6:
+  - optical
+  - triton
+nsupdate:
+  bin: /usr/bin/nsupdate
+  keyfile: misc/key.private
+  server: 127.0.0.1
+domain: esper.net
+default_ttl: 1000
+mail:
+  server: localhost
+  port: 25
+  from: monitor@esper.net
+  to: do-not-reply@invalid.com

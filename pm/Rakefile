@@ -1,0 +1,6 @@
+task :default => [ :test ]
+
+task :test do
+    ruby "tests/unit.rb"
+    ruby "tests/integration.rb"
+end

@@ -1,0 +1,2 @@
+class IrcError < RuntimeError
+end

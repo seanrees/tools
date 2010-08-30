@@ -1,0 +1,16 @@
+--- 
+pools:
+  irc:
+  - paradox
+  - snowdrift
+  - chocobo
+nsupdate:
+  bin: /usr/bin/nsupdate
+  keyfile: key.private
+  server: 127.0.0.1
+domain: test.esper.net
+default_ttl: 1000
+mail:
+  server: mx2.dreamfire.net
+  port: 25
+  from: monitor@esper.net
