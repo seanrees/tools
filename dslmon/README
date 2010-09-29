@@ -1,0 +1,36 @@
+DSL Monitoring Tool
+September 2010, Sean Rees
+
+This works on a ZyXEL P-660HW-T1 v2, a thoroughly incapable device. I
+developed this against V3.40(AXG.2), which is, as near as I can tell, a
+custom software build for my ISP (Magnet Networks in Ireland). This is
+my way of saying YMMV.
+
+Fair warning: the monitoring script caused my router to crash every 2 hours
+or so (polling once every 5 minutes).
+
+Apologies for the code quality; I used this as an excuse to learn Python.
+If it looks like n00bish code, that's why. I pretty much gave up on this
+after I figured out I wouldn't have stable internet access if I kept running
+this.
+
+Caveats over, this is how you use it:
+
+1) Edit get_data.sh and set
+   ROUTER_IP, ROUTER_PORT, and ROUTER_PASS.
+
+2) Run get_data.sh; the other scripts depend on the output going to
+   $ ./get_data.sh > /tmp/zyxel-data.txt
+
+3) dslmon.py generates HTML output and should be used as a CGI script.
+   (stats_parser.py parses the text, dashboard_builder.py builds the html)
+
+   It produces a simple dashboard with a tone histogram. The tones
+   more or less represent the capacity of the line at 512 fixed frequency
+   increments over the range of frequencies allowed for copper. Higher
+   values are better. The tone map can help point to frequencies your line
+   has trouble with, and help explain any bitrate maximas you might be seeing.
+      
+4) munin/ contains scripts to parse the text output and generate simple
+   data points for munin to graph. These should be converted to python
+   (but they came first before the python bits :))
