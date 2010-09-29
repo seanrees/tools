@@ -1,0 +1,32 @@
+#!/bin/sh
+
+case $1 in
+    config)
+        cat << 'EOM'
+graph_title DSL Bit Rates
+graph_args --base 1000 -l 0
+graph_vlabel db
+graph_category other
+graph_info DSL bitrates (interleaved and fastpath)
+bitrate_interleave_down_kbps.label bits-int-down (kbps)
+bitrate_interleave_down_kbps.info Bitrate Downstream (kbps)
+bitrate_fast_down_kbps.label bits-fast-down (kbps)
+bitrate_fast_down_kbps.info Bitrate Downstream (kbps)
+bitrate_interleave_up_kbps.label bits-int-up (kbps)
+bitrate_interleave_up_kbps.info Bitrate Upstream (kbps)
+bitrate_fast_up_kbps.label bits-fast-up (kbps)
+bitrate_fast_up_kbps.info Bitrate Upstream (kbps)
+EOM
+        exit 0;;
+esac
+
+FILE=/tmp/zyxel-data.txt
+if [ ! -f ${FILE} ]; then
+    echo "no data in ${FILE}"
+    exit 1
+fi
+
+echo "bitrate_interleave_down_kbps.value $(grep 'near-end interleaved' $FILE | awk '{print $6}') "
+echo "bitrate_fast_down_kbps.value $(grep 'near-end fast' $FILE | awk '{print $6}') "
+echo "bitrate_interleave_up_kbps.value $(grep 'far-end interleaved' $FILE | awk '{print $6}') "
+echo "bitrate_fast_up_kbps.value $(grep 'far-end fast' $FILE | awk '{print $6}') "
