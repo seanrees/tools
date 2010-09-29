@@ -1,0 +1,26 @@
+#!/bin/sh
+
+case $1 in
+    config)
+        cat << 'EOM'
+graph_title DSL Attenuation
+graph_args --base 1000 -l 0
+graph_vlabel db
+graph_category other
+graph_info Upstream and Downstream Attenuation Metrics in dB
+attenuation_up_db.label atten-up
+attenuation_up_db.info Attenuation Upstream (dB)
+attenuation_down_db.label atten-down
+attenuation_down_db.info Attenuation Downstream (dB)
+EOM
+        exit 0;;
+esac
+
+FILE=/tmp/zyxel-data.txt
+if [ ! -f ${FILE} ]; then
+    echo "no data in ${FILE}"
+    exit 1
+fi
+
+echo "attenuation_up_db.value $(grep 'attenuation upstream' $FILE | awk '{print $3}')"
+echo "attenuation_down_db.value $(grep 'attenuation down' $FILE | awk '{print $3}')"
