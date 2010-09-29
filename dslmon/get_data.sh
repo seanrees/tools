@@ -1,6 +1,7 @@
 #!/bin/sh
 
 ROUTER_IP=
+# telnet interface port
 ROUTER_PORT=
 ROUTER_PASS=
 
