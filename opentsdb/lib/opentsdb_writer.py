@@ -5,7 +5,8 @@ import socket
 import sys
 import time
 
-class OpenTSDBWriter:
+class OpenTSDBWriter(object):
+
   def __init__(self, timestamp=None, hostname=None):
     self._timestamp = (int)(time.time())
     self._hostname = socket.gethostname()
