@@ -2,6 +2,8 @@
 
 import logging
 
+# TODO: decide if this really needs to be class. It doesn't really
+# seem to need to be, but it is convenient...
 class BindStatsParser(object):
 
   def __init__(self, filename, read_back_bytes=2048):
