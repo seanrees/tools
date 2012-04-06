@@ -1,0 +1,27 @@
+zfs_incr implements a snapshot-based backup system for ZFS filesystems.
+
+The configuration lives in main(). The setup assumes a GELI-encrypted
+target device. This script will attach the GELI device, import the
+pool, and send snapshots to it. When finished, it will export the
+pool and detach the device.
+
+Sample run (slightly trimmed):
+2012/04/06 19:11:31 INFO Starting up...
+2012/04/06 19:11:33 DEBUG exec [return=0]: geli attach -k /root/offsite.key -j /dev/null /dev/da0
+2012/04/06 19:11:36 DEBUG exec [return=0]: zpool import offsite
+2012/04/06 19:11:36 DEBUG exec [return=0]: zfs list -t snapshot
+2012/04/06 19:11:36 INFO Snapshots loaded: {'tank/home': ['201204061725-backup'], 'offsite/home': ['20120310-backup', '201204061725-backup']}
+2012/04/06 19:12:36 INFO Processing tank/home
+2012/04/06 19:12:36 INFO Destination offsite/home
+2012/04/06 19:12:36 INFO Using 201204061725-backup as incremental base snapshot
+2012/04/06 19:12:37 DEBUG exec [return=0]: zfs rollback offsite/home@201204061725-backup
+2012/04/06 19:12:37 DEBUG exec [return=0]: zfs snapshot tank/home@201204061912-backup
+2012/04/06 19:12:37 DEBUG exec: zfs send -i tank/home@201204061725-backup tank/home@201204061912-backup
+2012/04/06 19:12:37 DEBUG pipe-to: zfs receive offsite/home
+2012/04/06 19:12:37 INFO Sending tank/home@201204061912-backup (base=201204061725-backup) to offsite/home
+2012/04/06 19:15:27 DEBUG zfs receive returncode = 0
+2012/04/06 19:15:27 DEBUG exec [return=0]: zfs destroy tank/home@201204061725-backup
+2012/04/06 19:15:28 DEBUG exec [return=0]: zfs destroy offsite/home@201204061725-backup
+2012/04/06 19:15:33 DEBUG exec [return=0]: zpool export offsite
+2012/04/06 19:15:34 DEBUG exec [return=0]: geli detach /dev/da0.eli
+2012/04/06 19:15:34 INFO Complete.
