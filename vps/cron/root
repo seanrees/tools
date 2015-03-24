@@ -1,0 +1,1 @@
+*/15 * * * * [ -d /root/vps ] && (cd /root/vps && bootstrap/update.sh)

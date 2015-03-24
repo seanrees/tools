@@ -1,0 +1,12 @@
+export HOSTNAME=ganos.dreamfire.net
+export NETIF=xn0
+export IPV4="DHCP"
+export IPV6="inet6 accept_rtadv"
+
+export INTIF=xn1
+export IPV4_INTIF="DHCP"
+
+export IPV6_PREFIX="2607:fc50:1001:3e00"
+export IPV6_ALIASES="::53 ::80"
+
+export SERVICES="openvpn named mail httpd zabbix"

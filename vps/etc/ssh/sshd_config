@@ -1,0 +1,3 @@
+Port 35
+Subsystem   sftp    /usr/libexec/sftp-server
+PermitRootLogin forced-commands-only
