@@ -17,7 +17,7 @@ def login(host, user, password):
   telnet.write(user + '\r\n')
   telnet.read_until('Password :', 1)
   telnet.write(password + '\r\n')
-  telnet.read_until('=>')
+  telnet.read_until('=>', 1)
   return telnet
 
 def command(telnet, command):
@@ -27,7 +27,7 @@ def command(telnet, command):
   # Strip the top and bottom line off.
   return '\r\n'.join(output.split('\r\n'))[1:-1]
 
-def parse(xdslinfo):
+def parse_baseinfo(xdslinfo):
   lines = xdslinfo.split('\r\n')
   data = {}
 
@@ -78,6 +78,21 @@ def parse(xdslinfo):
 
   return data
 
+def parse_ginp(ginp):
+  lines = ginp.split('\r\n')
+  data = {}
+
+  keys = ['rtx_tx', 'rtx_c', 'rtx_uc', 'LEFTRS', 'minEFTR', 'errFreeBits']
+
+  for l in lines:
+    for k in keys:
+      if k in l:
+        words = l.split()
+        data[k.lower() + '_far'] = words[-1]
+        data[k.lower() + '_near'] = words[-2]
+
+  return data
+
 def main(args):
   delay = 30
   output = '/tmp/magnet_state.out'
@@ -89,7 +104,13 @@ def main(args):
         telnet = login(HOST, USERNAME, PASSWORD)
 
       xdslinfo = command(telnet, 'xdsl info expand=yes')
-      data = parse(xdslinfo)
+      data = parse_baseinfo(xdslinfo)
+
+      ginp = command(telnet, 'xdsl info ginp=yes')
+      data.update(parse_ginp(ginp))
+
+      logging.info('data = %s', data)
+
       with open(output, 'wb') as f:
         data['ts'] = int(time.time())
         marshal.dump(data, f)
