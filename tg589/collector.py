@@ -79,7 +79,7 @@ def parse(xdslinfo):
   return data
 
 def main(args):
-  delay = 10
+  delay = 30
   output = '/tmp/magnet_state.out'
   telnet = None
 
