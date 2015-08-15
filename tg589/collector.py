@@ -93,8 +93,13 @@ def parse_ginp(ginp):
         max_val = pow(2, 31)    # Reports 2^31 for "omg."
         if far < max_val:
           data[k.lower() + '_far'] = far
+        else:
+          logging.info('Dropping out-of-range %s (far): %d', k, far)
+
         if near < max_val:
           data[k.lower() + '_near'] = near
+        else:
+          logging.info('Dropping out-of-range %s (near): %d', k, near)
 
   return data
 
@@ -113,8 +118,6 @@ def main(args):
 
       ginp = command(telnet, 'xdsl info ginp=yes')
       data.update(parse_ginp(ginp))
-
-      logging.info('data = %s', data)
 
       with open(output, 'wb') as f:
         data['ts'] = int(time.time())
