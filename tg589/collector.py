@@ -27,51 +27,56 @@ def command(telnet, command):
   # Strip the top and bottom line off.
   return '\r\n'.join(output.split('\r\n'))[1:-1]
 
+def make_key(words):
+  # Loss of signal -> loss_of_signal
+  return '_'.join(words.lower().split())
+
 def parse_baseinfo(xdslinfo):
   lines = xdslinfo.split('\r\n')
   data = {}
 
+  # Some constants/placeholders.
+  FarNearVals = object()
+  UpstreamDownstreamVals = object()
+  SingleVal = object()
+  AutogenKey = object()
+
+  keys = {
+    'Loss of signal':  (AutogenKey, SingleVal),
+    'Loss of frame':   (AutogenKey, SingleVal),
+    'Loss of power':   (AutogenKey, SingleVal),
+    'Error second':    ('error_seconds', SingleVal),
+    'Number of reset': ('resets', SingleVal),
+    'Payload rate':    ('rate', UpstreamDownstreamVals),
+    'Attenuation':     (AutogenKey, UpstreamDownstreamVals),
+    'Margins':         ('snr', UpstreamDownstreamVals),
+    'Output power':    ('power', UpstreamDownstreamVals),
+    'Code Violation':  (AutogenKey, FarNearVals),
+    'FEC':             (AutogenKey, FarNearVals),
+  }
+
   for l in lines:
-    words = l.split()
+    for k, props in keys.iteritems():
+      if k in l:
+        words = l.split()
+        if props[0] == AutogenKey:
+          data_key = make_key(k)
+        else:
+          data_key = props[0]
 
-    if 'Number of reset' in l:
-      data['resets'] = words[-1]
+        if props[1] == SingleVal:
+          data[data_key] = words[-1]
 
-    if 'Payload rate' in l:
-      data['upstream_rate'] = words[-1]
-      data['downstream_rate'] = words[-2]
+        if props[1] == FarNearVals:
+          data[data_key + '_far'] = words[-1]
+          data[data_key + '_near'] = words[-2]
 
-    if 'Attenuation' in l:
-      data['upstream_attenuation'] = words[-1]
-      data['downstream_attenuation'] = words[-2]
+        if props[1] == UpstreamDownstreamVals:
+          data['upstream_' + data_key] = words[-1]
+          data['downstream_' + data_key] = words[-2]
 
-    if 'Margins' in l:
-      data['upstream_snr'] = words[-1]
-      data['downstream_snr'] = words[-2]
-
-    if 'Output power' in l:
-      data['upstream_power'] = words[-1]
-      data['downstream_power'] = words[-2]
-
-    if 'Loss of signal' in l:
-      data['loss_of_signal'] = words[-1]
-
-    if 'Loss of frame' in l:
-      data['loss_of_frame'] = words[-1]
-
-    if 'Loss of power' in l:
-      data['loss_of_power'] = words[-1]
-
-    if 'Error second' in l:
-      data['error_seconds'] = words[-1]
-
-    if 'Code Violation' in l:
-      data['code_violation_far'] = words[-1]
-      data['code_violation_near'] = words[-2]
-
-    if 'FEC' in l:
-      data['fec_far'] = words[-1]
-      data['fec_near'] = words[-2]
+        # We found a key, no need to keep searching.
+        break
 
     if 'last 15 minutes' in l:
       break
@@ -119,6 +124,8 @@ def main(args):
       ginp = command(telnet, 'xdsl info ginp=yes')
       data.update(parse_ginp(ginp))
 
+      logging.info(data)
+
       with open(output, 'wb') as f:
         data['ts'] = int(time.time())
         marshal.dump(data, f)
@@ -127,7 +134,7 @@ def main(args):
       logging.error('Skipping collection, no connection: %s', se)
       telnet = None
     except ValueError, ve:
-      logging.error('Dumping to the %s failed: %s', output, ve)
+      logging.exception('Dumping to the %s failed: %s', output, ve)
 
     time.sleep(delay)
 
