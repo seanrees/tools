@@ -124,7 +124,7 @@ def main(args):
       ginp = command(telnet, 'xdsl info ginp=yes')
       data.update(parse_ginp(ginp))
 
-      logging.info(data)
+      #logging.info(data)
 
       with open(output, 'wb') as f:
         data['ts'] = int(time.time())
