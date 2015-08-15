@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/local/bin/python
 
 import marshal
 import sys
@@ -6,7 +6,7 @@ import time
 
 def main(argv):
   output = '/tmp/magnet_state.out'
-  tolerance = 20        # seconds.
+  tolerance = 35        # seconds.
   key = argv[1]
 
   with open(output, 'rb') as f:
