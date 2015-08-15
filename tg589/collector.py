@@ -88,8 +88,13 @@ def parse_ginp(ginp):
     for k in keys:
       if k in l:
         words = l.split()
-        data[k.lower() + '_far'] = words[-1]
-        data[k.lower() + '_near'] = words[-2]
+        far = int(words[-1])
+        near = int(words[-2])
+        max_val = pow(2, 31)    # Reports 2^31 for "omg."
+        if far < max_val:
+          data[k.lower() + '_far'] = far
+        if near < max_val:
+          data[k.lower() + '_near'] = near
 
   return data
 
