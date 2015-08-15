@@ -96,6 +96,9 @@ def parse_ginp(ginp):
         far = int(words[-1])
         near = int(words[-2])
         max_val = pow(2, 31)    # Reports 2^31 for "omg."
+        if k == 'errFreeBits':
+          max_val = sys.maxint
+
         if far < max_val:
           data[k.lower() + '_far'] = far
         else:
