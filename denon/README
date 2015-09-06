@@ -1,0 +1,14 @@
+denon implements a simple CLI for Denon AVR1912's.
+
+This device is controllable via telnet without authentication.
+
+To build:
+  GOPATH=`pwd`
+  go build denon
+  ./denon -help
+
+Sample commands:
+  denon -address 192.168.1.1 -volume 41.5
+  denon -address 192.168.1.1 -input GAME2
+  denon -address 192.168.1.1 -mode DIRECT
+  
