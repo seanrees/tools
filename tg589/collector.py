@@ -101,8 +101,6 @@ def parse_ginp(ginp):
         # report 2^31 (2^31 - 2147480000 = 3648 -- they missed it
         # by 3648. Sigh.)
         max_val = 2147480000
-        #if k == 'errFreeBits':
-        #  max_val = sys.maxint
 
         if far < max_val:
           data[k.lower() + '_far'] = far
