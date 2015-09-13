@@ -95,7 +95,12 @@ def parse_ginp(ginp):
         words = l.split()
         far = int(words[-1])
         near = int(words[-2])
-        max_val = pow(2, 30)    # Reports values >2^30 in error.
+
+        # Note: the TG589v3 reports 2147480000 as out of range.
+        # My understanding of the spec is that it's supposed to
+        # report 2^31 (2^31 - 2147480000 = 3648 -- they missed it
+        # by 3648. Sigh.)
+        max_val = 2147480000
         #if k == 'errFreeBits':
         #  max_val = sys.maxint
 
