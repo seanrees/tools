@@ -1,0 +1,11 @@
+grab implements a simple regular jpeg fetcher from Sarix cameras. It's
+actually generic, you can fetch any URL periodically and overwrite the
+same file.
+
+To build:
+  GOPATH=`pwd`
+  go build grab
+  ./grab-help
+
+Sample commands:
+  grab -url http://foo/bar -output file -frequency=1s
