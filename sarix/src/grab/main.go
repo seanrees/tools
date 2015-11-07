@@ -42,11 +42,11 @@ func main() {
 			log.Printf("Could not open %s for writing: %v", err)
 			continue
 		}
-		defer f.Close()
 
 		written, err := io.Copy(f, resp.Body)
 		if written < resp.ContentLength {
 			log.Printf("Truncated write to %s, wrote %d of %d", *output, written, resp.ContentLength)
 		}
+		f.Close()
 	}
 }
