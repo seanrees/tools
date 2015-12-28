@@ -1,6 +1,34 @@
-These are mostly tools I've written to automate various tasks that
-affect my life.
+This is a collection of tools / scripts that I've written that
+automate parts of my life. The tools are written in Go and Python
+primarily, with some occasional (bourne) shell and Ruby.
 
-Some were written to automate my stuff, some for EsperNet (which I am
-no longer involved with), some for other purposes. Really, you'll
-probably need to ask me what some of this stuff does. :)
+Active:
+  denon/ - a simple Go program to set volume and inputs on
+           certain Denon receivers (AVR1912)
+
+  sarix/ - (to be renamed): a simple timed downloader.
+           Give it a URL and a frequency and it'll fetch that
+           URL for you. I use it for webcam time-lapsing.
+
+  vps/   - Scripts to provision some FreeBSD virtual machines
+           from bare-metal to running. TODO: move to Puppet.
+           
+  zfs_incr/ - A script that manages incremental ZFS snap backups
+              to external storage. Supports GELI.
+              
+Inactive:
+  awstats/  - Automatically generate awstats for all Apache
+              virtual hosts.
+
+  dslmon/ &
+  tg589/    - Scripts for pulling statistics from various DSL
+              modems (primarily for graphing).
+
+  pm/ &
+  rsec/     - Some tools I wrote for EsperNet. pm managed irc.*
+              pools and did DNS updates. rsec was an experimental
+              IRC server implementing the TS6 server-to-server
+              protocol. I don't really recall what I was after
+              with this project.
+  
+  opentsdb/ - A BIND opentsdb collector.
