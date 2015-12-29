@@ -17,8 +17,10 @@ Active:
               to external storage. Supports GELI.
               
 Inactive:
-  tg589/    - Scripts for pulling statistics from various DSL
-              modems (primarily for graphing).
+  tg589/    - Script for pulling DSL statistics from Technicolor
+              TG589v3 VDSL modems. I used this to plot various
+              metrics (sync rate, attenuation, snr) as timeseries
+              on Zabbix.
 
   esper/    - Some tools I wrote for EsperNet. pm managed irc.*
               pools and did DNS updates. rsec was an experimental
