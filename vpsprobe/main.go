@@ -10,26 +10,24 @@ import (
 )
 
 // Flag Variables
-var silent bool
+var (
+	silent = true
 
-type SmtpOptions struct {
-	enable bool
-	server string
-	from   string
-	to     string
-	doSend bool
-}
+	smtpOpts = struct {
+		enable bool
+		server string
+		from   string
+		to     string
+		doSend bool
+	}{}
 
-var smtpOpts = SmtpOptions{}
-
-type HttpOptions struct {
-	enable bool
-	server string
-	url    string
-	code   int
-}
-
-var httpOpts = HttpOptions{}
+	httpOpts = struct {
+		enable bool
+		server string
+		url    string
+		code   int
+	}{}
+)
 
 func init() {
 	flag.BoolVar(&silent, "silent", true, "run silently")
@@ -46,7 +44,7 @@ func init() {
 	flag.IntVar(&httpOpts.code, "http_code", 200, "expected return code")
 }
 
-func Log(format string, v ...interface{}) {
+func logf(format string, v ...interface{}) {
 	if !silent {
 		log.Printf(format, v...)
 	}
@@ -54,7 +52,7 @@ func Log(format string, v ...interface{}) {
 
 func doSMTP(c chan bool) {
 	if smtpOpts.enable {
-		Log("SMTP enabled, server=%s", smtpOpts.server)
+		logf("SMTP enabled, server=%s", smtpOpts.server)
 		res, err := validator.ValidateSMTP(
 			smtpOpts.server, smtpOpts.from, smtpOpts.to, smtpOpts.doSend)
 		if err != nil {
@@ -69,7 +67,7 @@ func doSMTP(c chan bool) {
 
 func doHTTP(c chan bool) {
 	if httpOpts.enable {
-		Log("HTTP enabled, server=%s, url=%s", httpOpts.server, httpOpts.url)
+		logf("HTTP enabled, server=%s, url=%s", httpOpts.server, httpOpts.url)
 		res, err := validator.ValidateHTTP(
 			httpOpts.server, httpOpts.url, httpOpts.code)
 		if err != nil {
