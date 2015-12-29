@@ -25,5 +25,3 @@ Inactive:
               IRC server implementing the TS6 server-to-server
               protocol. I don't really recall what I was after
               with this project.
-  
-  opentsdb/ - A BIND opentsdb collector.
