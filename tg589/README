@@ -1,0 +1,59 @@
+Collect and read back various counters (sync rate, attenuation, signal
+to noise) from Technicolor TG589v3 modems. This should work on any
+such modem regardless of ISP, but in case it isn't, this was tested on
+the Magnet Networks Ireland (www.magnet.ie) firmware.
+
+  collector.py
+  ------------
+  This script connects to a modem using the HOST, USERNAME, PASSWORD
+  credentials at the top of script. It writes out a marshaled
+  Python dictionary in /tmp/magnet_state.out every 30 seconds.
+
+  reader.py
+  ---------
+  This script reads /tmp/magnet_state.out and will return to you the
+  key you request. Note: collector.py includes a timestamp in the output;
+  this is so reader.py will return no data if it's "too old." The
+  tolerance at the time of this writing is 35 seconds. If reader.py returns
+  no value (rather than an error), it's likely because the value has
+  timed out.
+
+    % ./reader.py downstream_attenuation
+    % ./reader.py downstream_rate
+
+  Some keys of interest:
+    downstream_attenuation      (gauge)
+    upstream_attenuation        (gauge)
+    code_violation_far          (counter)
+    code_violation_near         (counter)
+    errfreebits_far             (gauge)
+    errfreebits_near            (gauge)
+    error_seconds               (counter)
+    fec_far                     (counter)
+    fec_near                    (counter)
+    leftrs_far                  (counter)
+    leftrs_near                 (counter)
+    loss_of_frame               (counter)
+    loss_of_power               (counter)
+    loss_of_signal              (counter)
+    mineftr_far                 (counter)
+    mineftr_near                (counter)
+    resets                      (counter)
+    downstream_power            (gauge)
+    upstream_power              (gauge)
+    rtx_tx_far                  (counter)
+    rtx_tx_near                 (counter)
+    rtx_c_far                   (counter)
+    rtx_c_near                  (counter)
+    rtx_uc_far                  (counter)
+    rtx_uc_near                 (counter)
+    downstream_snr              (gauge)
+    upstream_snr                (gauge)
+    downstream_rate             (gauge)
+    upstream_rate               (gauge)
+
+  To use with Zabbix add an agent config like this:
+  UserParameter=tg589[*],/path/to/tg589/reader.py $1
+
+  Then add items of the form: tg589[downstream_attenuation] and
+  from there you can create graphs.
