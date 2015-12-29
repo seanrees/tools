@@ -3,8 +3,7 @@ denon implements a simple CLI for Denon AVR1912's.
 This device is controllable via telnet without authentication.
 
 To build:
-  GOPATH=`pwd`
-  go build denon
+  go build github.com/seanrees/tools/denon
   ./denon -help
 
 Sample commands:
