@@ -6,7 +6,7 @@ Active:
   denon/ - a simple Go program to set volume and inputs on
            certain Denon receivers (AVR1912)
 
-  sarix/ - (to be renamed): a simple timed downloader.
+  grab/  - (to be renamed): a simple timed downloader.
            Give it a URL and a frequency and it'll fetch that
            URL for you. I use it for webcam time-lapsing.
 
