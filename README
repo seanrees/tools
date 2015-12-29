@@ -17,15 +17,10 @@ Active:
               to external storage. Supports GELI.
               
 Inactive:
-  awstats/  - Automatically generate awstats for all Apache
-              virtual hosts.
-
-  dslmon/ &
   tg589/    - Scripts for pulling statistics from various DSL
               modems (primarily for graphing).
 
-  pm/ &
-  rsec/     - Some tools I wrote for EsperNet. pm managed irc.*
+  esper/    - Some tools I wrote for EsperNet. pm managed irc.*
               pools and did DNS updates. rsec was an experimental
               IRC server implementing the TS6 server-to-server
               protocol. I don't really recall what I was after
