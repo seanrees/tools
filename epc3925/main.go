@@ -50,7 +50,11 @@ func (m *modem) login() (string, error) {
 
 func (m *modem) reboot(sessionId string) error {
 	path := fmt.Sprintf("http://%s/goform/Devicerestart", m.host)
-	args := url.Values{"devicerestart": {"1"}}
+	args := url.Values{}
+	args.Set("devicerestart", "1")
+	// Typo 'restrat' vs. 'restart' is expected :-(
+	args.Set("devicerestrat_Password_check", m.password)
+
 	req, err := http.NewRequest("POST", path, strings.NewReader(args.Encode()))
 	if err != nil {
 		return err
