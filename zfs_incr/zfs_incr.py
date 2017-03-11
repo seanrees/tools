@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3 -bb
+#!/usr/bin/python3 -bb
 
 import argparse
 import atexit
@@ -14,9 +14,9 @@ import sys
 Config = collections.namedtuple('Config', ['device', 'key', 'zpool', 'filesystems', 'detach'])
 
 configs = {
-  'name': Config(
-    device='/dev/da0', key='path-to-key', zpool='zpool-to-backup',
-    filesystems=['zpool-to-backup/zfs0', 'zpool-to-backup/zfs1'],
+  'offsite': Config(
+    device='/dev/sdi1', key='/root/offsite/offsite', zpool='offsite',
+    filesystems=['das/git', 'das/home', 'das/media'],
     detach=True),
 }
 
@@ -82,22 +82,18 @@ class OffsiteStorage(object):
                pass_file='/dev/null', dryrun=False):
     self._device = device
     self._key_file = key_file
-    self._pass_file = pass_file
     self._zpool_name = zpool_name
     self._dryrun = dryrun
 
     # State
     self._is_attached = False
     self._is_imported = False
-    self._is_file_attached = False
-    self._filename = None
 
     self._Init()
 
   def _Init(self):
     # Figure out if this is a file-backed device.
     st = os.stat(self._device)
-    self._is_file_backed = stat.S_ISREG(st.st_mode)
 
     def Split(exc, delim='\t'):
       return [line.split(delim) for line in exc.output.split('\n')]
@@ -109,36 +105,14 @@ class OffsiteStorage(object):
       # Imported implies attached.
       self._is_attached = self._is_imported
 
-    if self._is_file_backed:
-      self._filename = self._device
-
-      exc = Exec('mdconfig', '-lv', dryrun=False)
-      devs = [dev[0] for dev in Split(exc) if dev[-1] == self._filename]
-      if devs:
-        self._is_file_attached = True
-        self._device = '/dev/' + devs[0]
-
     if not self._is_attached:
-      exc = Exec('geli', 'status', '-s', dryrun=False)
-      dev = self._device[5:]    # /dev/foo -> foo
-      devs = [dev[-1] for dev in Split(exc, delim='  ')]
-      self._is_attached = dev in devs
+      self._is_attached = Exec('cryptsetup', 'status', 'offiste', dryrun=False).Success()
 
   def Attach(self):
-    if self._is_file_backed and not self._is_file_attached:
-      exc = Exec('mdconfig', '-S', '4096', '-f', self._filename, dryrun=self._dryrun)
-      if exc.Success():
-        dev = exc.output
-        logging.info('Attached %s to %s', self._device, dev)
-        self._device = '/dev/' + dev
-        self._is_file_attached = True
-      else:
-        return False
-
     if not self._is_attached:
-      self._is_attached = Exec('geli', 'attach', '-k',
-                               self._key_file, '-j',
-                               self._pass_file, self._device,
+      self._is_attached = Exec('cryptsetup', 'open', '--type=luks',
+                               '--key-file=' + self._key_file,
+                               self._device, self._zpool_name,
                                dryrun=self._dryrun).Success()
 
     return self._is_attached
@@ -146,12 +120,7 @@ class OffsiteStorage(object):
   def Detach(self):
     assert self._is_attached
 
-    device_eli = self._device + '.eli'
-    self._is_attached = not Exec('geli', 'detach', device_eli, dryrun=self._dryrun).Success()
-
-    if self._device.startswith('/dev/md'):
-      dev = self._device[7:]  # /dev/md5 -> 5
-      self._is_file_attached = not Exec('mdconfig', '-d', '-u', dev, dryrun=self._dryrun).Success()
+    self._is_attached = not Exec('cryptsetup', 'close', self._zpool_name, dryrun=self._dryrun).Success()
 
   def Import(self):
     assert self._is_attached
