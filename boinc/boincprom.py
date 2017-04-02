@@ -9,6 +9,7 @@ import collections
 import io
 import subprocess
 import sys
+import time
 
 def get_boinc_state(boinccmd):
   args = [boinccmd, '--get_state']
@@ -51,17 +52,17 @@ def parse(section, headings):
 
   return out
 
-def print_projects(projects):
+def print_projects(f, projects):
   # These are all counters.
   for p in projects:
     name = p['name']
     del(p['name'])
     for k, v in p.items():
       var = 'boinc_project_%s' % k
-      print('# TYPE %s counter' % var)
-      print('%s{name="%s"} %s' % (var, name, v))
+      f.write('# TYPE %s counter\n' % var)
+      f.write('%s{name="%s"} %s\n' % (var, name, v))
 
-def print_tasks(tasks):
+def print_tasks(f, tasks):
   states = collections.defaultdict(int)
 
   # Tasks oscillate between these two states; so preset
@@ -69,8 +70,8 @@ def print_tasks(tasks):
   states['SUSPENDED'] = 0
   states['EXECUTING'] = 0
 
-  print('# TYPE boinc_task_fraction_done gauge')
-  print('# TYPE boinc_task_current_cpu_time counter')
+  f.write('# TYPE boinc_task_fraction_done gauge\n')
+  f.write('# TYPE boinc_task_current_cpu_time counter\n')
   for t in tasks:
     name = t['name']
     state = t['active_task_state']
@@ -78,26 +79,40 @@ def print_tasks(tasks):
     cpu = t['current CPU time']
 
     states[state] += 1
-    print('boinc_task_fraction_done{name="%s"} %s' % (name, done))
-    print('boinc_task_current_cpu_time{name="%s"} %s' % (name, cpu))
+    f.write('boinc_task_fraction_done{name="%s"} %s\n' % (name, done))
+    f.write('boinc_task_current_cpu_time{name="%s"} %s\n' % (name, cpu))
 
-  print('# TYPE boinc_task_state gauge')
+  f.write('# TYPE boinc_task_state gauge\n')
   for state, count in states.items():
-    print('boinc_task_state{state="%s"} %s' % (state, count))
+    f.write('boinc_task_state{state="%s"} %s\n' % (state, count))
 
-def main(boinccmd):
+def main(boinccmd, interval, out):
+  if not interval:
+    once(boinccmd, out)
+    return
+
+  try:
+    while True:
+      start = time.time()
+      once(boinccmd, out)
+      time.sleep(interval - (time.time() - start))
+  except:
+      print("Interrupt received, exiting")
+
+def once(boinccmd, out):
   state = get_boinc_state(boinccmd)
   lines = io.TextIOWrapper(io.BytesIO(state)).readlines()
 
-  projects = []
-  headings = ['name', 'user_total_credit', 'user_expavg_credit',
-              'host_total_credit', 'host_expavg_credit']
-  projects = parse(section(lines, 'Projects'), headings)
-  print_projects(projects)
+  with open(out, 'w') as f:
+    projects = []
+    headings = ['name', 'user_total_credit', 'user_expavg_credit',
+                'host_total_credit', 'host_expavg_credit']
+    projects = parse(section(lines, 'Projects'), headings)
+    print_projects(f, projects)
 
-  headings = ['name', 'active_task_state', 'fraction done', 'current CPU time']
-  tasks = parse(section(lines, 'Tasks'), headings)
-  print_tasks(tasks)
+    headings = ['name', 'active_task_state', 'fraction done', 'current CPU time']
+    tasks = parse(section(lines, 'Tasks'), headings)
+    print_tasks(f, tasks)
 
 
 if __name__ == '__main__':
@@ -106,6 +121,15 @@ if __name__ == '__main__':
           '--boinccmd', metavar='B',
           default='/usr/bin/boinccmd',
           help='Path to boinccmd')
+  parser.add_argument(
+          '--interval', metavar='I',
+          default=0,
+          help='Frequency of run in seconds (0 means run once)')
+  parser.add_argument(
+          '--out', metavar='O',
+          default='stdout',
+          help='File to write to')
+
 
   args = parser.parse_args()
-  main(boinccmd=args.boinccmd)
+  main(boinccmd=args.boinccmd, interval=int(args.interval), out=args.out)
